@@ -1,0 +1,32 @@
+spring:
+  cloud:
+    
+    #Vault configuration
+    vault:
+      fail-fast : true                        #In some cases, it may be desirable to fail startup of a service if it cannot connect to the Vault Server. If this is the desired behavior, set the bootstrap configuration property spring.cloud.vault.fail-fast=true and the client will halt with an Exception.
+      
+      #Authentication with token
+      authentication: token 
+      scheme: http                            #setting the scheme to http will use plain HTTP. Supported schemes are http and https
+      token: 33010e81-bad3-64d0-4a0c-a26c0dbce115                                #configure the Vault endpoint with an URI. Takes precedence over host/port/scheme configuration
+      uri: http://localhost:8200              #configure the Vault endpoint with an URI. Takes precedence over host/port/scheme configuration
+      connection-timeout: 5000                #sets the connection timeout in milliseconds
+      read-timeout: 15000                     #sets the read timeout in milliseconds
+      config:
+          order: 1                            #sets the order for the property source
+          
+      #Enable the generic backend
+      generic:
+        enabled: false
+        
+      #Secret engine: Versioned Key-Value Backend
+      kv:
+        application-name: my-app              #overrides the application name for use in the generic backend
+        enabled: true                         #setting this value to false disables the secret backend config usage
+        backend: secret                       #sets the path of the secret mount to use
+        profile-separator: /                  #separates the profile name from the context in property sources with profiles
+        default-context: application          #sets the context name used by all applications
+
+#Server port deploy
+server:
+  port: 8080

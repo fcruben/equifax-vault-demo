@@ -1,0 +1,62 @@
+-----------------------------------------------------------------------------------------------------------------
+VAULT -------------------------------------------------------------------------------------------------------------
+
+	Deploy vault -> $ vault server -dev -log-level=INFO -dev-root-token-id=0
+	Environment variable -> $ set VAULT_ADDR=http://127.0.0.1:8200
+	Environment variable Linux -> $ export VAULT_ADDR=http://127.0.0.1:8200
+	
+-----------------------------------------------------------------------------------------------------------------
+VAULT LOG AUDITORIA ------------------------------------------------------------------------------------------
+
+	Activar audit file ->  $ vault audit enable file file_path=file.log
+	Desactivar/cerrar audit file ->$ vault audit disable file
+
+-----------------------------------------------------------------------------------------------------------------
+KV ---------------------------------------------------------------------------------------------------------------
+
+	Put secret -> $ vault kv put secret/my-app kv.secret.user=root kv.secret.pwd=root kv.new.secret="otro valor nuevo"
+	Get secret -> $ vault kv get secret/my-app
+	List secrets -> $ vault secrets list -detailed
+	
+	Put secret vía API -> curl --header "X-Vault-Token: 0" --request POST --data @data.json http://127.0.0.1:8200/v1/secret/metadata/my-app
+	Get secret vía API -> curl --header "X-Vault-Token: 0" http://127.0.0.1:8200/v1/secret/data/my-app
+	List secrets via API -> curl --header "X-Vault-Token: 0" --request LIST http://127.0.0.1:8200/v1/secret/metadata/
+
+
+
+-----------------------------------------------------------------------------------------------------------------
+MYSQL ---------------------------------------------------------------------------------------------------------------
+* Create user vault into MySql
+
+	$ mysql -u root -p
+	mysql> CREATE USER 'vault'@'localhost' IDENTIFIED BY 'password';
+	mysql> GRANT ALL PRIVILEGES ON *.* TO 'vault'@'localhost' WITH GRANT OPTION;
+
+* Create the database spring and a table messages
+
+	mysql> create database db;
+	mysql> use db;
+	mysql> create table message(id int not null auto_increment, text varchar(256), primary key (id));
+	mysql> insert into message(text) values ('Hi Spring Vault!');
+
+
+-----------------------------------------------------------------------------------------------------------------
+POLICY ---------------------------------------------------------------------------------------------------------------
+
+* Create policy
+
+	# This section grants all access on "secret/*". Further restrictions can be
+	# applied to this broad policy, as shown below.
+	path "secret/*" {
+	  capabilities = ["create", "read", "update", "delete", "list"]
+	}
+	
+
+* Create TOKEN
+
+	$ vault policy write my-app-policy my-app-policy.hcl
+	$ vault token create -policy=my-app-policy
+	$ vault policy list
+	$ vault policy read my-app-policy
+
+-----------------------------------------------------------------------------------------------------------------
